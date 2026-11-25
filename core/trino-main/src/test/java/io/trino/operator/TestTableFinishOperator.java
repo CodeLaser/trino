@@ -213,7 +213,6 @@ public class TestTableFinishOperator
         private boolean finished;
         private Collection<Slice> fragments;
         private Collection<ComputedStatistics> computedStatistics;
-        private TableExecuteContext tableExecuteContext;
 
         @Override
         public Optional<ConnectorOutputMetadata> finishTable(Collection<Slice> fragments, Collection<ComputedStatistics> computedStatistics, TableExecuteContext tableExecuteContext)
@@ -222,7 +221,6 @@ public class TestTableFinishOperator
             finished = true;
             this.fragments = fragments;
             this.computedStatistics = computedStatistics;
-            this.tableExecuteContext = tableExecuteContext;
             return Optional.empty();
         }
 
@@ -234,11 +232,6 @@ public class TestTableFinishOperator
         public Collection<ComputedStatistics> getComputedStatistics()
         {
             return computedStatistics;
-        }
-
-        public TableExecuteContext getTableExecuteContext()
-        {
-            return tableExecuteContext;
         }
     }
 }

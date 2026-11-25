@@ -320,11 +320,4 @@ public class TestAsyncFilteredPageSource
             }
         };
     }
-
-    private static void drainPageSource(AsyncFilteredPageSource pageSource)
-    {
-        while (!pageSource.isFinished()) {
-            pageSource.getNextSourcePage();
-        }
-    }
 }

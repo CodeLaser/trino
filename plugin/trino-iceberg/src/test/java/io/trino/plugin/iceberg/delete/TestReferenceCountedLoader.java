@@ -560,12 +560,6 @@ class TestReferenceCountedLoader
             assertThat(interrupted.await(TIMEOUT, SECONDS)).isTrue();
         }
 
-        public void awaitFinished()
-                throws InterruptedException
-        {
-            assertThat(finished.await(TIMEOUT, SECONDS)).isTrue();
-        }
-
         public boolean wasInterrupted()
         {
             return interrupted.getCount() == 0;

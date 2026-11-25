@@ -32,7 +32,6 @@ import org.openjdk.jmh.annotations.Warmup;
 import java.util.Optional;
 import java.util.Random;
 
-import static io.trino.jmh.Benchmarks.benchmark;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -127,11 +126,5 @@ public class BenchmarkNullablePositions
             data.setup();
             getNonNullPositions(data);
         }
-    }
-
-    static void main()
-            throws Exception
-    {
-        benchmark(BenchmarkNullablePositions.class).run();
     }
 }
