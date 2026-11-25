@@ -68,75 +68,63 @@ class TestHiveStorageFormats
             // write precision is not relevant here, as Hive always uses nanos
             timestampAndPrecision(
                     "1967-01-02 12:01:00.111", // millis, no rounding
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.111",
                     "1967-01-02 12:01:00.111000",
                     "1967-01-02 12:01:00.111000000"),
             timestampAndPrecision(
                     "1967-01-02 12:01:00.1114", // hundreds of micros, rounds down in millis, (pre-epoch)
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.111",
                     "1967-01-02 12:01:00.111400",
                     "1967-01-02 12:01:00.111400000"),
             timestampAndPrecision(
                     "1967-01-02 12:01:00.1115", // hundreds of micros, rounds up in millis (smallest), pre-epoch
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.112",
                     "1967-01-02 12:01:00.111500",
                     "1967-01-02 12:01:00.111500000"),
             timestampAndPrecision(
                     "1967-01-02 12:01:00.111499", // micros, rounds down (largest), pre-epoch
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.111",
                     "1967-01-02 12:01:00.111499",
                     "1967-01-02 12:01:00.111499000"),
             timestampAndPrecision(
                     "1967-01-02 12:01:00.1113334", // hundreds of nanos, rounds down
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.111",
                     "1967-01-02 12:01:00.111333",
                     "1967-01-02 12:01:00.111333400"),
             timestampAndPrecision(
                     "1967-01-02 23:59:59.999999999", // nanos, rounds up to next day
-                    NANOSECONDS,
                     "1967-01-03 00:00:00.000",
                     "1967-01-03 00:00:00.000000",
                     "1967-01-02 23:59:59.999999999"),
 
             timestampAndPrecision(
                     "1967-01-02 12:01:00.1110019", // hundreds of nanos, rounds down in millis and up in micros, pre-epoch
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.111",
                     "1967-01-02 12:01:00.111002",
                     "1967-01-02 12:01:00.111001900"),
             timestampAndPrecision(
                     "1967-01-02 12:01:00.111901001", // nanos, rounds up in millis and down in micros, pre-epoch
-                    NANOSECONDS,
                     "1967-01-02 12:01:00.112",
                     "1967-01-02 12:01:00.111901",
                     "1967-01-02 12:01:00.111901001"),
             timestampAndPrecision(
                     "1967-12-31 23:59:59.999999499", // nanos, rounds micros down (largest), rounds millis up to next year, pre-epoch
-                    NANOSECONDS,
                     "1968-01-01 00:00:00.000",
                     "1967-12-31 23:59:59.999999",
                     "1967-12-31 23:59:59.999999499"),
 
             timestampAndPrecision(
                     "2027-01-02 12:01:00.1110019", // hundreds of nanos, rounds down in millis and up in micros, post-epoch
-                    NANOSECONDS,
                     "2027-01-02 12:01:00.111",
                     "2027-01-02 12:01:00.111002",
                     "2027-01-02 12:01:00.111001900"),
             timestampAndPrecision(
                     "2027-01-02 12:01:00.111901001", // nanos, rounds up in millis and down in micros, post-epoch
-                    NANOSECONDS,
                     "2027-01-02 12:01:00.112",
                     "2027-01-02 12:01:00.111901",
                     "2027-01-02 12:01:00.111901001"),
             timestampAndPrecision(
                     "2027-12-31 23:59:59.999999499", // nanos, rounds micros down (largest), rounds millis up to next year, post-epoch
-                    NANOSECONDS,
                     "2028-01-01 00:00:00.000",
                     "2027-12-31 23:59:59.999999",
                     "2027-12-31 23:59:59.999999499"));
@@ -766,7 +754,6 @@ class TestHiveStorageFormats
      */
     private static TimestampAndPrecision timestampAndPrecision(
             String writeValue,
-            HiveTimestampPrecision precision,
             String milliReadValue,
             String microReadValue,
             String nanoReadValue)
@@ -775,24 +762,21 @@ class TestHiveStorageFormats
                 MILLISECONDS, milliReadValue,
                 MICROSECONDS, microReadValue,
                 NANOSECONDS, nanoReadValue);
-        return new TimestampAndPrecision(precision, writeValue, readValues);
+        return new TimestampAndPrecision(writeValue, readValues);
     }
 
     private static class TimestampAndPrecision
     {
         private static int counter;
         private final int id;
-        // precision used when writing the data
-        private final HiveTimestampPrecision precision;
         // inserted value
         private final String writeValue;
         // expected values to be read back at various precisions
         private final Map<HiveTimestampPrecision, String> readValues;
 
-        public TimestampAndPrecision(HiveTimestampPrecision precision, String writeValue, Map<HiveTimestampPrecision, String> readValues)
+        public TimestampAndPrecision(String writeValue, Map<HiveTimestampPrecision, String> readValues)
         {
             this.id = counter++;
-            this.precision = precision;
             this.writeValue = writeValue;
             this.readValues = readValues;
         }
@@ -800,11 +784,6 @@ class TestHiveStorageFormats
         public int getId()
         {
             return id;
-        }
-
-        public HiveTimestampPrecision getPrecision()
-        {
-            return precision;
         }
 
         public String getWriteValue()

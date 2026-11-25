@@ -389,17 +389,6 @@ public final class SuiteRunner
             return this;
         }
 
-        /**
-         * Excludes one test method of a class given by binary name, as test classes are usually package-private.
-         */
-        public TestRun excludeTest(String className, String methodName)
-        {
-            requireNonNull(className, "className is null");
-            requireNonNull(methodName, "methodName is null");
-            excludedTests.add(MethodSource.from(className, methodName));
-            return this;
-        }
-
         public TestRunResult run()
                 throws Exception
         {

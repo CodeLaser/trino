@@ -369,7 +369,7 @@ public class TestScaledWriterScheduler
         @Override
         public Optional<RemoteTask> scheduleTask(InternalNode node, int partition, Multimap<PlanNodeId, Split> initialSplits)
         {
-            return Optional.of(new TestingRemoteTask(new TaskId(stageId, partition, 0), "nodeId", fragment));
+            return Optional.of(new TestingRemoteTask(new TaskId(stageId, partition, 0), "nodeId"));
         }
 
         @Override

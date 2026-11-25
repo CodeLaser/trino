@@ -18,7 +18,6 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.trino.filesystem.Location;
 import io.trino.filesystem.azure.AbstractTestAzureFileSystemFloci.FlociAzureResource;
 import io.trino.spi.security.ConnectorIdentity;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -68,14 +67,6 @@ final class TestAzureFileSystemConcurrencyLimit
                 Optional.of(resource.httpClient()));
         fileSystem = (AzureFileSystem) fileSystemFactory.create(ConnectorIdentity.ofUser("test"));
         fileSystem.createBlobContainerClient(new AzureLocation(location("")), Optional.empty()).create();
-    }
-
-    @AfterAll
-    void tearDownFileSystem()
-    {
-        if (fileSystemFactory != null) {
-            fileSystemFactory.destroy();
-        }
     }
 
     @Test

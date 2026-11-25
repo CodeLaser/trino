@@ -15,8 +15,6 @@ package io.trino.execution;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -86,16 +84,11 @@ public class TestingRemoteTaskFactory
             Optional<DataSize> estimatedMemory,
             boolean summarizeTaskInfo)
     {
-        TestingRemoteTask task = new TestingRemoteTask(taskId, node.getNodeIdentifier(), fragment);
+        TestingRemoteTask task = new TestingRemoteTask(taskId, node.getNodeIdentifier());
         task.addSplits(initialSplits);
         task.setOutputBuffers(outputBuffers);
         checkState(tasks.put(taskId, task) == null, "task already exist: %s", taskId);
         return task;
-    }
-
-    public synchronized Map<TaskId, TestingRemoteTask> getTasks()
-    {
-        return ImmutableMap.copyOf(tasks);
     }
 
     public static class TestingRemoteTask
@@ -104,7 +97,6 @@ public class TestingRemoteTaskFactory
         private final TaskStateMachine taskStateMachine;
         private final String nodeId;
         private final URI location;
-        private final PlanFragment fragment;
 
         private final AtomicLong nextTaskStatusVersion = new AtomicLong(TaskStatus.STARTING_VERSION);
 
@@ -112,20 +104,12 @@ public class TestingRemoteTaskFactory
         private final Set<PlanNodeId> noMoreSplits = ConcurrentHashMap.newKeySet();
         @GuardedBy("this")
         private final Multimap<PlanNodeId, Split> splits = ArrayListMultimap.create();
-        @GuardedBy("this")
-        private OutputBuffers outputBuffers;
 
-        public TestingRemoteTask(TaskId taskId, String nodeId, PlanFragment fragment)
+        public TestingRemoteTask(TaskId taskId, String nodeId)
         {
             this.taskStateMachine = new TaskStateMachine(taskId, directExecutor());
             this.nodeId = requireNonNull(nodeId, "nodeId is null");
             this.location = URI.create("fake://task/" + taskId + "/node/" + nodeId);
-            this.fragment = requireNonNull(fragment, "fragment is null");
-        }
-
-        public PlanFragment getFragment()
-        {
-            return fragment;
         }
 
         @Override
@@ -211,20 +195,10 @@ public class TestingRemoteTaskFactory
             started.set(true);
         }
 
-        public boolean isStarted()
-        {
-            return started.get();
-        }
-
         @Override
         public synchronized void addSplits(Multimap<PlanNodeId, Split> splits)
         {
             this.splits.putAll(splits);
-        }
-
-        public synchronized Multimap<PlanNodeId, Split> getSplits()
-        {
-            return ImmutableListMultimap.copyOf(splits);
         }
 
         @Override
@@ -233,26 +207,15 @@ public class TestingRemoteTaskFactory
             noMoreSplits.add(sourceId);
         }
 
-        public Set<PlanNodeId> getNoMoreSplits()
-        {
-            return ImmutableSet.copyOf(noMoreSplits);
-        }
-
         @Override
         public synchronized void setOutputBuffers(OutputBuffers outputBuffers)
         {
-            this.outputBuffers = outputBuffers;
         }
 
         @Override
         public void setSpeculative(boolean speculative)
         {
             // ignore
-        }
-
-        public synchronized OutputBuffers getOutputBuffers()
-        {
-            return outputBuffers;
         }
 
         @Override
@@ -321,11 +284,6 @@ public class TestingRemoteTaskFactory
         public PartitionedSplitsInfo getQueuedPartitionedSplitsInfo()
         {
             return PartitionedSplitsInfo.forZeroSplits();
-        }
-
-        public void finish()
-        {
-            taskStateMachine.finished();
         }
 
         @Override

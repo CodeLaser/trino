@@ -74,13 +74,6 @@ class PreferredProperties
                 .build();
     }
 
-    public static PreferredProperties distributed()
-    {
-        return builder()
-                .global(Global.distributed())
-                .build();
-    }
-
     public static PreferredProperties partitioned(Partitioning partitioning)
     {
         return builder()
@@ -198,11 +191,6 @@ class PreferredProperties
         public static Global distributed(Optional<PartitioningProperties> partitioningProperties)
         {
             return new Global(true, partitioningProperties);
-        }
-
-        public static Global distributed()
-        {
-            return distributed(Optional.empty());
         }
 
         public static Global distributed(PartitioningProperties partitioning)
